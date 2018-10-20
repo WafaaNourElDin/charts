@@ -4,8 +4,8 @@ Below you will find some information on how to perform common tasks.<br>
 You can find the most recent version of this guide [here](https://github.com/facebook/create-react-app/blob/master/packages/react-scripts/template/README.md).
 
 ## Table of Contents
--[1-run npm i](#1-run-npm-i)
--[2-run npm start](#2-run-npm-start)
+- [1-run npm i](#1-run-npm-i)
+- [2-run npm start](#2-run-npm-start)
 - [Updating to New Releases](#updating-to-new-releases)
 - [Sending Feedback](#sending-feedback)
 - [Folder Structure](#folder-structure)
