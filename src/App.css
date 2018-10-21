@@ -33,5 +33,5 @@ header{
     padding: 5pt;
 }
 .selected{
-    fill: green !important;
+    fill: #0a2a2a !important;
 }
