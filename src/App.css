@@ -11,7 +11,6 @@ svg{
     font-size: 3.5px !important;
     font-weight: 600;
 }
-
 h3{
     color: #333;
     font-size: 13pt;
@@ -26,4 +25,13 @@ h3{
 .btn-toolbar {
     display: inline-block;
     margin-top: 5px;
+}
+header{
+    background: #5DADE2;
+    color: #fff;
+    font-size: 27pt;
+    padding: 5pt;
+}
+.selected{
+    fill: green !important;
 }

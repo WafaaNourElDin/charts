@@ -265,12 +265,23 @@ class App extends Component {
         return this.dateArray.push({ date: order.orderDate });
       });
   }
+  changeSelectedFilterColor(chartIndex,svgIndex,pathIndex){
+    const charts = document.getElementsByClassName('VictoryContainer')
+    let arr = [].slice.call(document.getElementsByClassName("selected"));
+    arr.forEach(item => {
+      item.classList.remove("selected");
+    });
+    charts[chartIndex].children[0].children[svgIndex].childNodes[pathIndex].classList.add("selected");
+  }
   render() {
 
     this.getData(false);
     this.getData(true);
     return (
       <Grid>
+        <Row>
+          <header>Orders Charts</header>
+        </Row>
         <Row>
           <div className="container">
             <Col xs={12} md={4} className="chart-class">
@@ -281,6 +292,12 @@ class App extends Component {
                   eventHandlers: {
                     onClick: () => {
                       return [
+                        {
+                          target: "data",
+                          mutation: (props) => {
+                           this.changeSelectedFilterColor(0,0,props.index);
+                          }
+                        },
                         {
 
                           target: "labels",
@@ -310,7 +327,13 @@ class App extends Component {
                   target: "data",
                   eventHandlers: {
                     onClick: () => {
-                      return [{
+                      return [
+                        {
+                          target: "data",
+                          mutation: (props) => {
+                           this.changeSelectedFilterColor(1,0,props.index);
+                          }
+                        },{
                         target: "labels",
                         mutation: (props) => {
                           this.filterData(CONST.FILTER_KEYS.orderdate, props.slice.data.x)
@@ -339,6 +362,12 @@ class App extends Component {
                   eventHandlers: {
                     onClick: () => {
                       return [
+                        {
+                          target: "data",
+                          mutation: (props) => {
+                           this.changeSelectedFilterColor(2,0, props.index);
+                          }
+                        },
                         {
                           target: "labels",
                           mutation: (props) => {
@@ -374,6 +403,12 @@ class App extends Component {
                     onClick: () => {
                       return [
                         {
+                          target: "data",
+                          mutation: (props) => {
+                           this.changeSelectedFilterColor(3,0,props.index);
+                          }
+                        },
+                        {
                           target: "labels",
                           mutation: (props) => {
                             console.log(props)
@@ -402,7 +437,13 @@ class App extends Component {
                   target: "data",
                   eventHandlers: {
                     onClick: () => {
-                      return [{
+                      return [
+                        {
+                          target: "data",
+                          mutation: (props) => {
+                           this.changeSelectedFilterColor(4,0,props.index);
+                          }
+                        },{
                         target: "labels",
                         mutation: (props) => {
                           this.filterData(CONST.FILTER_KEYS.orderdate, props.slice.data.x, CONST.FILTER_KEYS.orderdateRevenue)
@@ -431,6 +472,12 @@ class App extends Component {
                   eventHandlers: {
                     onClick: () => {
                       return [
+                        {
+                          target: "data",
+                          mutation: (props) => {
+                           this.changeSelectedFilterColor(5,0,props.index);
+                          }
+                        },
                         {
                           target: "labels",
                           mutation: (props) => {
@@ -476,7 +523,7 @@ class App extends Component {
                             target: "data",
                             mutation: (props) => {
                               this.filterData(CONST.FILTER_KEYS.branch, props.datum.x, CONST.FILTER_KEYS.branchRevenue)
-
+                              this.changeSelectedFilterColor(6,0,props.index);
                             }
                           }
                         ];
@@ -506,6 +553,7 @@ class App extends Component {
                             target: "data",
                             mutation: (props) => {
                               this.filterData(CONST.FILTER_KEYS.deliveryArea, props.datum.x, CONST.FILTER_KEYS.deliveryAreaRevenue)
+                              this.changeSelectedFilterColor(7,0,props.index);
                             }
                           }
                         ];
@@ -535,6 +583,7 @@ class App extends Component {
                             target: "data",
                             mutation: (props) => {
                               this.filterData(CONST.FILTER_KEYS.orderDay, props.datum.x, CONST.FILTER_KEYS.orderDayRevenue)
+                              this.changeSelectedFilterColor(8,0,props.index);
                             }
                           }
                         ];
@@ -567,7 +616,7 @@ class App extends Component {
                             target: "data",
                             mutation: (props) => {
                               this.filterData(CONST.FILTER_KEYS.branch, props.datum.x)
-
+                              this.changeSelectedFilterColor(9,0,props.index);
                             }
                           }
                         ];
@@ -597,6 +646,7 @@ class App extends Component {
                             target: "data",
                             mutation: (props) => {
                               this.filterData(CONST.FILTER_KEYS.deliveryArea, props.datum.x)
+                              this.changeSelectedFilterColor(10,0,props.index);
                             }
                           }
                         ];
@@ -626,6 +676,7 @@ class App extends Component {
                             target: "data",
                             mutation: (props) => {
                               this.filterData(CONST.FILTER_KEYS.orderDay, props.datum.x)
+                              this.changeSelectedFilterColor(11,0,props.index);
                             }
                           }
                         ];
@@ -651,7 +702,7 @@ class App extends Component {
                 </DropdownButton>
               </ButtonToolbar>
               <VictoryChart height={200}>
-                <VictoryLine 
+                <VictoryLine
                   data={this.noOfOrdersByDate}
                   style={{
                     data: { stroke: "#5DADE2" },
@@ -674,6 +725,7 @@ class App extends Component {
                           target: "data",
                           mutation: (props) => {
                             this.filterData(CONST.FILTER_KEYS.orderFullDate, props.datum.x)
+                            this.changeSelectedFilterColor(12,1,props.index);
                           }
                         }
                         ];
@@ -718,6 +770,7 @@ class App extends Component {
                           target: "data",
                           mutation: (props) => {
                             this.filterData(CONST.FILTER_KEYS.orderFullDate, props.datum.x, CONST.FILTER_KEYS.orderDateRevenue)
+                            this.changeSelectedFilterColor(13,1,props.index);
                           }
                         }
                         ];
