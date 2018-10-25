@@ -40,7 +40,6 @@ npm i
 ```
 **Running**
 ```
-npm i
 npm start
 ```
 
