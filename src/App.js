@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { VictoryPie, VictoryChart, VictoryBar, VictoryLine, VictoryScatter } from 'victory';
 import lodash from 'lodash';
-import { Grid, Row, Col, ButtonToolbar, DropdownButton, MenuItem } from 'react-bootstrap';
-import './bootstrap/css/bootstrap.css'
-import * as moment from 'moment'
+import { Grid, Row, Col, ButtonToolbar, DropdownButton, MenuItem, Button } from 'react-bootstrap';
+import './bootstrap/css/bootstrap.css';
+import * as moment from 'moment';
 import './App.css';
 import { CONST } from './const/const'
 var data = require('./data/data.json');
@@ -51,7 +51,11 @@ class App extends Component {
     this.afternoon = [12, 13, 14, 15, 16, 17];
     this.evening = [18, 19, 20];
     this.night = [21, 22, 23, 0, 1, 2, 3, 4, 5];
+
     this.dateArray = [];
+    // array of filters that user choose to filter the date 
+    this.filterValues = [];
+    this.filterKeys = [];
 
   }
   // function to fill dataset and take boolen parameter to know if it is revenue or order count 
@@ -265,22 +269,45 @@ class App extends Component {
         return this.dateArray.push({ date: order.orderDate });
       });
   }
-  changeSelectedFilterColor(chartIndex,svgIndex,pathIndex){
+  // function to change selected part and push data in filters array 
+  changeSelectedFilterColor(chartIndex, svgIndex, index, data, key, styles, filterKey) {
     const charts = document.getElementsByClassName('VictoryContainer')
+    const element = charts[chartIndex].children[0].children[svgIndex].childNodes[index];
     let arr = [].slice.call(document.getElementsByClassName("selected"));
     arr.forEach(item => {
       item.classList.remove("selected");
     });
-    charts[chartIndex].children[0].children[svgIndex].childNodes[pathIndex].classList.add("selected");
+    element.classList.add("selected");
+    if (data === CONST.ORDER_PERIOD.morning) {
+      this.filterValues.push(...this.morning);
+    }
+    else if (data === CONST.ORDER_PERIOD.afternoon) {
+      this.filterValues.push(...this.afternoon);
+    }
+    else if (data === CONST.ORDER_PERIOD.evening) {
+      this.filterValues.push(...this.evening);
+    }
+    else if (data === CONST.ORDER_PERIOD.night) {
+      this.filterValues.push(...this.night);
+    }
+    else {
+      this.filterValues.push(data)
+    }
+    this.filterKeys.push(key);
+    this.filterData(key, data, filterKey)
+
   }
   render() {
-
     this.getData(false);
     this.getData(true);
     return (
       <Grid>
         <Row>
           <header>Orders Charts</header>
+        </Row>
+        <Row>
+          <Button onClick={this.removeFilters}>Remove Filters</Button>
+
         </Row>
         <Row>
           <div className="container">
@@ -295,14 +322,7 @@ class App extends Component {
                         {
                           target: "data",
                           mutation: (props) => {
-                           this.changeSelectedFilterColor(0,0,props.index);
-                          }
-                        },
-                        {
-
-                          target: "labels",
-                          mutation: (props) => {
-                            this.filterData(CONST.FILTER_KEYS.paymentMethod, props.slice.data.x)
+                            this.changeSelectedFilterColor(0, 0, props.index, props.slice.data.x, CONST.FILTER_KEYS.paymentMethod, props.style);
                           }
                         }
                       ];
@@ -331,14 +351,9 @@ class App extends Component {
                         {
                           target: "data",
                           mutation: (props) => {
-                           this.changeSelectedFilterColor(1,0,props.index);
+                            this.changeSelectedFilterColor(1, 0, props.index, props.slice.data.x, CONST.FILTER_KEYS.orderdate, props.style);
                           }
-                        },{
-                        target: "labels",
-                        mutation: (props) => {
-                          this.filterData(CONST.FILTER_KEYS.orderdate, props.slice.data.x)
                         }
-                      }
                       ];
                     }
                   }
@@ -365,13 +380,7 @@ class App extends Component {
                         {
                           target: "data",
                           mutation: (props) => {
-                           this.changeSelectedFilterColor(2,0, props.index);
-                          }
-                        },
-                        {
-                          target: "labels",
-                          mutation: (props) => {
-                            this.filterData(CONST.FILTER_KEYS.orderAmount, props.slice.data.x)
+                            this.changeSelectedFilterColor(2, 0, props.index, props.slice.data.x, CONST.FILTER_KEYS.orderAmount, props.style);
                           }
                         }
                       ];
@@ -390,7 +399,6 @@ class App extends Component {
                 }} />
             </Col>
           </div>
-
         </Row>
         <Row>
           <div className="container">
@@ -405,14 +413,8 @@ class App extends Component {
                         {
                           target: "data",
                           mutation: (props) => {
-                           this.changeSelectedFilterColor(3,0,props.index);
-                          }
-                        },
-                        {
-                          target: "labels",
-                          mutation: (props) => {
-                            console.log(props)
-                            this.filterData(CONST.FILTER_KEYS.paymentMethod, props.slice.data.x, CONST.FILTER_KEYS.paymentMethodRevenue)
+                            this.changeSelectedFilterColor(3, 0, props.index, props.slice.data.x, CONST.FILTER_KEYS.paymentMethod, props.style, CONST.FILTER_KEYS.paymentMethodRevenue);
+
                           }
                         }
                       ];
@@ -441,14 +443,9 @@ class App extends Component {
                         {
                           target: "data",
                           mutation: (props) => {
-                           this.changeSelectedFilterColor(4,0,props.index);
+                            this.changeSelectedFilterColor(4, 0, props.index, props.slice.data.x, CONST.FILTER_KEYS.orderdate, props.style, CONST.FILTER_KEYS.orderdateRevenue);
                           }
-                        },{
-                        target: "labels",
-                        mutation: (props) => {
-                          this.filterData(CONST.FILTER_KEYS.orderdate, props.slice.data.x, CONST.FILTER_KEYS.orderdateRevenue)
                         }
-                      }
                       ];
                     }
                   }
@@ -475,14 +472,8 @@ class App extends Component {
                         {
                           target: "data",
                           mutation: (props) => {
-                           this.changeSelectedFilterColor(5,0,props.index);
-                          }
-                        },
-                        {
-                          target: "labels",
-                          mutation: (props) => {
-                            console.log(props)
-                            this.filterData(CONST.FILTER_KEYS.orderAmount, props.slice.data.x, CONST.FILTER_KEYS.orderAmountRevenue)
+                            this.changeSelectedFilterColor(5, 0, props.index, props.slice.data.x, CONST.FILTER_KEYS.orderAmount, props.style, CONST.FILTER_KEYS.orderAmountRevenue);
+
                           }
                         }
                       ];
@@ -522,8 +513,7 @@ class App extends Component {
                           {
                             target: "data",
                             mutation: (props) => {
-                              this.filterData(CONST.FILTER_KEYS.branch, props.datum.x, CONST.FILTER_KEYS.branchRevenue)
-                              this.changeSelectedFilterColor(6,0,props.index);
+                              this.changeSelectedFilterColor(6, 0, props.index, props.datum.x, CONST.FILTER_KEYS.branch, props.style, CONST.FILTER_KEYS.branchRevenue);
                             }
                           }
                         ];
@@ -552,8 +542,7 @@ class App extends Component {
                           {
                             target: "data",
                             mutation: (props) => {
-                              this.filterData(CONST.FILTER_KEYS.deliveryArea, props.datum.x, CONST.FILTER_KEYS.deliveryAreaRevenue)
-                              this.changeSelectedFilterColor(7,0,props.index);
+                              this.changeSelectedFilterColor(7, 0, props.index, props.datum.x, CONST.FILTER_KEYS.deliveryArea, props.style, CONST.FILTER_KEYS.deliveryAreaRevenue);
                             }
                           }
                         ];
@@ -582,8 +571,7 @@ class App extends Component {
                           {
                             target: "data",
                             mutation: (props) => {
-                              this.filterData(CONST.FILTER_KEYS.orderDay, props.datum.x, CONST.FILTER_KEYS.orderDayRevenue)
-                              this.changeSelectedFilterColor(8,0,props.index);
+                              this.changeSelectedFilterColor(8, 0, props.index, props.datum.x, CONST.FILTER_KEYS.orderDay, props.style, CONST.FILTER_KEYS.orderDayRevenue);
                             }
                           }
                         ];
@@ -615,10 +603,10 @@ class App extends Component {
                           {
                             target: "data",
                             mutation: (props) => {
-                              this.filterData(CONST.FILTER_KEYS.branch, props.datum.x)
-                              this.changeSelectedFilterColor(9,0,props.index);
+                              this.changeSelectedFilterColor(9, 0, props.index, props.datum.x, CONST.FILTER_KEYS.branch, props.style);
                             }
                           }
+
                         ];
                       }
                     }
@@ -645,10 +633,10 @@ class App extends Component {
                           {
                             target: "data",
                             mutation: (props) => {
-                              this.filterData(CONST.FILTER_KEYS.deliveryArea, props.datum.x)
-                              this.changeSelectedFilterColor(10,0,props.index);
+                              this.changeSelectedFilterColor(10, 0, props.index, props.datum.x, CONST.FILTER_KEYS.deliveryArea, props.style);
                             }
                           }
+
                         ];
                       }
                     }
@@ -675,8 +663,7 @@ class App extends Component {
                           {
                             target: "data",
                             mutation: (props) => {
-                              this.filterData(CONST.FILTER_KEYS.orderDay, props.datum.x)
-                              this.changeSelectedFilterColor(11,0,props.index);
+                              this.changeSelectedFilterColor(11, 0, props.index, props.datum.x, CONST.FILTER_KEYS.orderDay, props.style);
                             }
                           }
                         ];
@@ -696,7 +683,7 @@ class App extends Component {
               <ButtonToolbar>
                 <DropdownButton title={this.state.orderCountDropdownTitle || this.dateArray[0].date} pullRight id="split-button-pull-right">
                   {this.dateArray.map((date, index) => {
-                    return (<MenuItem key={index} eventKey={index} onClick={() => { console.log(date.date); this.setState({ orderCountDropdownTitle: date.date }) }}>{date.date}</MenuItem>)
+                    return (<MenuItem key={index} eventKey={index} onClick={() => { this.setState({ orderCountDropdownTitle: date.date }) }}>{date.date}</MenuItem>)
 
                   })}
                 </DropdownButton>
@@ -721,13 +708,13 @@ class App extends Component {
                     target: "data",
                     eventHandlers: {
                       onClick: () => {
-                        return [{
-                          target: "data",
-                          mutation: (props) => {
-                            this.filterData(CONST.FILTER_KEYS.orderFullDate, props.datum.x)
-                            this.changeSelectedFilterColor(12,1,props.index);
+                        return [
+                          {
+                            target: "data",
+                            mutation: (props) => {
+                              this.changeSelectedFilterColor(12, 1, props.index, props.datum.x, CONST.FILTER_KEYS.orderFullDate, props.style);
+                            }
                           }
-                        }
                         ];
                       }
                     }
@@ -766,13 +753,13 @@ class App extends Component {
                     target: "data",
                     eventHandlers: {
                       onClick: () => {
-                        return [{
-                          target: "data",
-                          mutation: (props) => {
-                            this.filterData(CONST.FILTER_KEYS.orderFullDate, props.datum.x, CONST.FILTER_KEYS.orderDateRevenue)
-                            this.changeSelectedFilterColor(13,1,props.index);
+                        return [
+                          {
+                            target: "data",
+                            mutation: (props) => {
+                              this.changeSelectedFilterColor(13, 1, props.index, props.datum.x, CONST.FILTER_KEYS.orderFullDate, props.style, CONST.FILTER_KEYS.orderDateRevenue);
+                            }
                           }
-                        }
                         ];
                       }
                     }
@@ -787,49 +774,66 @@ class App extends Component {
   }
   // function to filter data by selected filter 
   filterData(key, value, filterKey) {
-    const filteredData = this.state.data.filter(order => {
-      switch (key) {
-        case CONST.FILTER_KEYS.orderdate:
-          let dateHours = new Date(order.orderdate).getUTCHours();
-          if (value === CONST.ORDER_PERIOD.morning) {
-            return this.morning.includes(dateHours);
+    var filteredData;
+    if (this.filterValues.length < 1) {
+      filteredData = this.state.data
+    }
+    else {
+      filteredData = this.state.data.filter(order => {
+        return this.filterKeys.every(key => {
+          switch (key) {
+            case CONST.FILTER_KEYS.orderdate:
+              let dateHours = new Date(order.orderdate).getUTCHours();
+              return this.filterValues.includes(dateHours);
+            case CONST.FILTER_KEYS.orderAmount:
+              let continueExecution = false;
+              const price = Number(order[key].replace('$', ''));
+              if (this.filterValues.includes(CONST.ORDER_AMOUNT.lessThan10$$)) {
+                continueExecution = price < 10;
+                if (continueExecution) {
+                  return continueExecution
+                }
+              }
+              if (this.filterValues.includes(CONST.ORDER_AMOUNT.from10$TO20$)) {
+                continueExecution = price >= 10 && price < 20;
+                if (continueExecution) {
+                  return continueExecution
+                }
+              }
+              if (this.filterValues.includes(CONST.ORDER_AMOUNT.from20$To40$)) {
+                continueExecution = price >= 20 && price < 40;
+                if (continueExecution) {
+                  return continueExecution
+                }
+              }
+              if (this.filterValues.includes(CONST.ORDER_AMOUNT.from40$To70$)) {
+                continueExecution = price >= 40 && price < 70;
+                if (continueExecution) {
+                  return continueExecution
+                }
+              }
+              if (this.filterValues.includes(CONST.ORDER_AMOUNT.moreThan70$)) {
+                continueExecution = price >= 70;
+                if (continueExecution) {
+                  return continueExecution
+                }
+              }
+              break
+            case CONST.FILTER_KEYS.orderDay:
+              return this.filterValues.includes(moment(order.orderdate).format('dddd'));
+            case CONST.FILTER_KEYS.orderFullDate:
+              return this.filterValues.includes(this.formatDate(order.orderdate, true));
+            case CONST.FILTER_KEYS.paymentMethod:
+            case CONST.FILTER_KEYS.branch:
+            case CONST.FILTER_KEYS.deliveryArea:
+              return this.filterValues.includes(order[key]);
+            default:
+              return [];
           }
-          else if (value === CONST.ORDER_PERIOD.afternoon) {
-            return this.afternoon.includes(dateHours);
-          }
-          else if (value === CONST.ORDER_PERIOD.evening) {
-            return this.evening.includes(dateHours);
-          }
-          else {
-            return this.night.includes(dateHours);
-          }
-        case CONST.FILTER_KEYS.orderAmount:
-          const price = Number(order[key].replace('$', ''));
-          if (value === CONST.ORDER_AMOUNT.lessThan10$$) {
-            return price < 10;
-          }
-          else if (value === CONST.ORDER_AMOUNT.from10$TO20$) {
-            return price >= 10 && price < 20;
-          }
-          else if (value === CONST.ORDER_AMOUNT.from20$To40$) {
-            return price >= 20 && price < 40;
-          }
-          else if (value === CONST.ORDER_AMOUNT.from40$To70$) {
-            return price >= 40 && price < 70;
-          }
-          else {
-            return price >= 70;
-          }
-        case CONST.FILTER_KEYS.orderDay:
-          return moment(order.orderdate).format('dddd') === value;
-        case CONST.FILTER_KEYS.orderFullDate:
-          return this.formatDate(order.orderdate, true) === value;
-        default:
+        })
+      })
 
-          return order[key] === value;
-      }
-    })
-    console.log(filteredData)
+    }
     // change state to rerender charts
     switch (filterKey || key) {
       case CONST.FILTER_KEYS.paymentMethod:
@@ -1084,6 +1088,31 @@ class App extends Component {
       return dateArray[1] + '-' + dateArray[0];
 
     }
+  }
+  // function to remove filters and reset data
+  removeFilters = () => {
+    this.setState({
+      paymentMethodOrderCount: this.state.data,
+      timeOrderCount: this.state.data,
+      orderAmountOrderCount: this.state.data,
+      branchOrdercount: this.state.data,
+      deliveryAreaOrderCount: this.state.data,
+      orderDayOrderCount: this.state.data,
+      paymentMethodRevenue: this.state.data,
+      timeRevenue: this.state.data,
+      orderAmountRevenuet: this.state.data,
+      branchRevenue: this.state.data,
+      deliveryAreaRevenue: this.state.data,
+      orderDayRevenue: this.state.data,
+      orderDateOrderCount: this.state.data,
+      orderDateRevenue: this.state.data,
+    })
+    this.filterKeys = [];
+    this.filterValues = [];
+    let arr = [].slice.call(document.getElementsByClassName("selected"));
+    arr.forEach(item => {
+      item.classList.remove("selected");
+    });
   }
 }
 export default App;
